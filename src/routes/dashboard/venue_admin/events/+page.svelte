@@ -2,7 +2,8 @@
 
     import { supabase } from "$lib/supabaseClient";
     import { onMount } from 'svelte';
-
+    import { goto } from '$app/navigation';
+    
     // Create and event vars
     let showCreateForm = $state(false);
     let events:any = $state([]);
@@ -36,14 +37,14 @@
             
             if (!user) throw new Error('User not authenticated');
 
-            // const { data, error } = await supabase
-            //     .from('events')
-            //     .select('*')
-            //     .eq('user_id', user.id);
+            const { data, error } = await supabase
+                .from('events')
+                .select('*')
+                .eq('user_id', user.id);
 
-            // if (error) throw error;
+            if (error) throw error;
 
-            // events = data;
+            events = data;
 
         } catch (error) {
             console.error('Error fetching events:', error);
@@ -299,6 +300,11 @@
         }
     }
 
+    // Open the event details page
+    function navigateToEventDetails(event: any) {
+        goto(`/dashboard/venue_admin/event_details/?eID=${event.id}`);
+    }
+
 </script>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -435,7 +441,7 @@
                         </button>
                     </div>
                 </form>
-            </div>
+            </div>●●●●●●●●●●●●●●
         </div>
     {/if}
 
@@ -645,7 +651,7 @@
         {:else}
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {#each events as event}
-                    <div class="bg-white rounded-lg shadow p-6">
+                    <div class="bg-white rounded-lg shadow p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg">
                         <div class="flex justify-between items-start mb-4">
                             <h3 class="text-lg font-semibold text-gray-900">{event.event_name}</h3>
                                 <div class="flex space-x-2">
@@ -719,7 +725,9 @@
                                 </div>
                         </div>
                         <!-- Event Cards -->
-                        <div class="space-y-2 text-sm text-gray-600">
+                        <div class="space-y-2 text-sm text-gray-600"
+                        onclick={() => navigateToEventDetails(event)}
+                        >
                             <p><span class="font-medium">Date:</span> {new Date(event.event_date).toLocaleDateString()}</p>
                             <p><span class="font-medium">Venue:</span> {event.venue_name}</p>
                             <p><span class="font-medium">Address:</span> {event.venue_address}</p>
